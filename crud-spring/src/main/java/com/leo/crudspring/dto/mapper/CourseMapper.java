@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Component
 public class CourseMapper {
 
-    public CourseDTO toDTO(Course course) {
+    public CourseDTO  toDTO(Course course) {
         if (course == null) {
             return null;
         }
@@ -40,7 +40,17 @@ public class CourseMapper {
         Category category = getCategoryByValue(courseDTO.category());
         course.setCategory(category);
 
-        course.setStatus("Ativo");
+        List<Lesson> lessons = courseDTO.lessons().stream().map(lessonDTO -> {
+            var lesson = new Lesson();
+            lesson.setId(lessonDTO.id());
+            lesson.setName(lessonDTO.name());
+            lesson.setYoutubeUrl(lessonDTO.youtubeUrl());
+            lesson.setCourse(course);
+            return lesson;
+        }).collect(Collectors.toList());
+
+        course.setLessons(lessons);
+
         return course;
     }
 

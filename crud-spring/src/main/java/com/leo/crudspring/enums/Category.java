@@ -7,6 +7,7 @@ public enum Category {
 
     private String value;
 
+
     private Category(String value) {
         this.value = value;
     }

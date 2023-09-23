@@ -4,6 +4,7 @@ import com.leo.crudspring.dto.CourseDTO;
 import com.leo.crudspring.dto.mapper.CourseMapper;
 import com.leo.crudspring.enums.Category;
 import com.leo.crudspring.exception.RecordNotFoundException;
+import com.leo.crudspring.model.Course;
 import com.leo.crudspring.repository.CourseRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -42,11 +43,14 @@ public class CourseService {
     public CourseDTO update(@NotNull @Positive Long id, @Valid @NotNull CourseDTO courseDTO) {
         return courseRepository.findById(id)
                 .map(record -> {
+                    Course course = courseMapper.toEntity(courseDTO);
                     record.setName(courseDTO.name());
 
                     Category category = courseMapper.getCategoryByValue(courseDTO.category());
                     record.setCategory(category);
 
+                    record.getLessons().clear();
+                    course.getLessons().forEach(lesson -> record.getLessons().add(lesson));
 //                    record.setCategory(Category.valueOf(courseDTO.category()));
                     return courseRepository.save(record);
                 }).map(courseMapper::toDTO)

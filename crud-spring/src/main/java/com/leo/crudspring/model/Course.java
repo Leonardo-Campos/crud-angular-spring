@@ -2,11 +2,14 @@ package com.leo.crudspring.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.leo.crudspring.enums.Category;
+import com.leo.crudspring.enums.Status;
 import com.leo.crudspring.enums.converters.CategoryConverter;
+import com.leo.crudspring.enums.converters.StatusConverter;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -17,7 +20,7 @@ import java.util.List;
 
 @Data
 @Entity
-@SQLDelete(sql = "UPDATE Course SET status = 'Inativo' WHERE id = ?")
+@SQLDelete(sql = "UPDATE courses.course SET status = 'Inativo' WHERE id = ?")
 @Where(clause = "status = 'Ativo'")
 public class Course {
 
@@ -28,31 +31,25 @@ public class Course {
 
     @NotBlank
     @NotNull
-    @Length(min = 4, max = 100)
+    @Length(min = 5, max = 100)
     @Column(length = 100, nullable = false)
     private String name;
 
-    //    @NotBlank
     @NotNull
-//    @Length(max = 10)
-//    @Pattern(regexp = "Back-End|Front-End")
-    @Column(length = 200, nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Column(length = 10, nullable = false)
     @Convert(converter = CategoryConverter.class)
     private Category category;
 
-    /**
-     * TO-DO: ENUMS for category and Status
-     * Classes 43 and 44 have bugs
-     */
+    @NotNull
+    @Column(length = 10, nullable = false)
+    @Convert(converter = StatusConverter.class)
+    private Status status = Status.ACTIVE;
 
     @NotNull
-    @Length(max = 10)
-    @Pattern(regexp = "Ativo|Inativo")
-    @Column(length = 10, nullable = false)
-    private String status = "Ativo";
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @NotEmpty
+    @Valid
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "course")
+    // @JoinColumn(name = "course_id")
     private List<Lesson> lessons = new ArrayList<>();
 
 }
